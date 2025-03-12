@@ -1,0 +1,88 @@
+<!-- 
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, OCaml, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
+
+-->
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проста гра</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background: #eee;
+            display: block;
+            margin: auto;
+            cursor: none; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Ухиляйся від перешкод!</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        let player = { x: 180, y: 350, width: 40, height: 40 };
+        let obstacles = [];
+        let gameOver = false;
+        
+        
+        canvas.addEventListener("mousemove", (event) => {
+            if (!gameOver) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                if (mouseX > player.width / 2 && mouseX < canvas.width - player.width / 2) {
+                    player.x = mouseX - player.width / 2;
+                }
+            }
+        });
+        
+        function spawnObstacle() {
+            let x = Math.random() * (canvas.width - 20);
+            obstacles.push({ x, y: 0, width: 20, height: 20, speed: 2 });
+        }
+        
+        function update() {
+            if (gameOver) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "blue";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            ctx.fillStyle = "red";
+            obstacles.forEach((obstacle, index) => {
+                obstacle.y += obstacle.speed;
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                
+                if (obstacle.y > canvas.height) obstacles.splice(index, 1);
+                if (
+                    player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y
+                ) {
+                    gameOver = true;
+                    alert("Гру закінчено!");
+                }
+            });
+            
+            requestAnimationFrame(update);
+        }
+        
+        setInterval(spawnObstacle, 1000);
+        update();
+    </script>
+</body>
+</html>
